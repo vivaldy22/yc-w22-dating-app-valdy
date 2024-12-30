@@ -1,0 +1,17 @@
+httpPort: 8090
+databaseMaster:
+  debugMode: true
+  host: "localhost"
+  port: 5432
+  name: "dating-db"
+  schema: "dating-db"
+  username: "your-db-username"
+  password: "your-db-password"
+databaseSlave:
+  debugMode: true
+  host: "localhost"
+  port: 5432
+  name: "dating-db"
+  schema: "dating-db"
+  username: "your-db-username"
+  password: "your-db-password"
