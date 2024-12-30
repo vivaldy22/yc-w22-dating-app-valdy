@@ -1,0 +1,293 @@
+{
+	"info": {
+		"_postman_id": "509deeea-3a78-48db-bb23-24b906778862",
+		"name": "DatingAppDealls",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37133523"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testing@mail.com\",\n    \"password\": \"YLI09Ru0g52xGvl5IEBtzpdgNryLPMerhZ6UplokaJI03Jc=\",\n    \"name\": \"Testing Name\",\n    \"bio\": \"\",\n    \"age\": 18,\n    \"gender\": \"m\",\n    \"location\": \"Jakarta\",\n    \"photos\": \"http://image.url\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/v1/auth/signup",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();",
+									"",
+									"pm.collectionVariables.set(\"jwt-token\", response.data.access_token)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testing@mail.com\",\n    \"password\": \"YLI09Ru0g52xGvl5IEBtzpdgNryLPMerhZ6UplokaJI03Jc=\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/v1/auth/login",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Onboard",
+			"item": [
+				{
+					"name": "Get Swipeable Profiles",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-url}}/v1/onboard/swipe/profiles",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"onboard",
+								"swipe",
+								"profiles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Swipe Left (Pass)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"swiped_id\": \"019415c8-4467-7a39-9292-77500c884595\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/v1/onboard/swipe/pass",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"onboard",
+								"swipe",
+								"pass"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Swipe Right (Like)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"swiped_id\": \"019411ea-733e-7059-b9cb-72bebad0f781\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/v1/onboard/swipe/like",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"onboard",
+								"swipe",
+								"like"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buy Premium Feature",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"feature\": \"verified_user\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/v1/onboard/premium/buy",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"onboard",
+								"premium",
+								"buy"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base-url",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "jwt-token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
