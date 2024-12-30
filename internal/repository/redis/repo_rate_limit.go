@@ -64,6 +64,7 @@ func (r *rateLimitRepository) Get(ctx context.Context, rateLimitType, rateLimitI
 	key := fmt.Sprintf("%s#%s", rateLimitType, rateLimitIdentifier)
 	val, err := r.client.Get(ctx, key).Result()
 	if errors.Is(err, redis.Nil) {
+		log.Printf("rate limit %s not exist", rateLimitIdentifier)
 		return 0, ierror.ErrDataNotFound
 	}
 	if err != nil {

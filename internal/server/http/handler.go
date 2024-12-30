@@ -17,7 +17,7 @@ type handler struct {
 func (s *server) SetupHandlers() {
 	s.h = &handler{
 		authHandler:    newAuthHandler(s.di.AuthService),
-		onboardHandler: newOnboardHandler(s.di.SwipeService),
+		onboardHandler: newOnboardHandler(s.di.OnboardService),
 	}
 }
 

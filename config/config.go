@@ -12,12 +12,13 @@ type Configuration struct {
 	HttpPort       int
 	DatabaseMaster Database
 	DatabaseSlave  Database
-	RedisOption    redis.Options
+	Redis          redis.Options
 	HashSecret     string
 	JWTSecret      string
 	FeatureFlag    struct {
 		EnableDatabaseAutoMigrate bool
 	}
+	SwipeDailyLimit int64
 }
 
 type Database struct {

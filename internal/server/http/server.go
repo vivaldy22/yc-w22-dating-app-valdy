@@ -9,6 +9,7 @@ import (
 type server struct {
 	di *di.DI
 	h  *handler
+	m  *middleware
 }
 
 func StartHttpServer(di *di.DI) error {
@@ -19,7 +20,7 @@ func StartHttpServer(di *di.DI) error {
 	}
 
 	s.SetupHandlers()
-	//s.SetupMiddlewares()
+	s.SetupMiddlewares(di.Configuration)
 	s.SetupRoutes()
 
 	err := s.di.Echo.Start(di.Configuration.GetHttpPort())

@@ -7,11 +7,12 @@ func (s *server) SetupRoutes() {
 		auth.POST("/login", s.h.authHandler.Login)
 	}
 
-	// TODO: middleware not yet
-	swipe := s.di.Echo.Group("/v1/onboard/swipe")
+	onboard := s.di.Echo.Group("/v1/onboard", s.m.JWTMiddleware)
 	{
-		swipe.GET("/profiles", s.h.onboardHandler.GetSwipeableProfiles)
-		swipe.POST("/pass", s.h.onboardHandler.SwipePass)
-		swipe.POST("/like", s.h.onboardHandler.SwipeLike)
+		onboard.GET("/swipe/profiles", s.h.onboardHandler.GetSwipeableProfiles)
+		onboard.POST("/swipe/pass", s.h.onboardHandler.SwipePass)
+		onboard.POST("/swipe/like", s.h.onboardHandler.SwipeLike)
+
+		onboard.POST("/premium/buy", s.h.onboardHandler.BuyPremiumFeature)
 	}
 }

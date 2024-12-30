@@ -19,6 +19,7 @@ import (
 	"yc-w22-dating-app-valdy/internal/repository/redis"
 	"yc-w22-dating-app-valdy/pkg/crypto"
 	ierror "yc-w22-dating-app-valdy/pkg/error"
+	ijwt "yc-w22-dating-app-valdy/pkg/jwt"
 )
 
 type (
@@ -80,28 +81,28 @@ func (s *service) SignUp(ctx context.Context, req model.SignUpRequest) (model.Si
 	userID, err := uuid.NewV7()
 	if err != nil {
 		log.Printf("failed to generate user id: %s\n", err.Error())
-		return model.SignUpResponse{}, err
+		return model.SignUpResponse{}, ierror.ErrGeneral
 	}
 
 	// Generate Profile ID using google uuid v7
 	profileID, err := uuid.NewV7()
 	if err != nil {
 		log.Printf("failed to generate profile id: %s\n", err.Error())
-		return model.SignUpResponse{}, err
+		return model.SignUpResponse{}, ierror.ErrGeneral
 	}
 
 	// Decrypt password from frontend
 	plainPassword, err := crypto.Decrypt(req.Password, s.cfg.HashSecret)
 	if err != nil {
 		log.Printf("failed to decrypt password: %s\n", err.Error())
-		return model.SignUpResponse{}, err
+		return model.SignUpResponse{}, ierror.ErrGeneral
 	}
 
 	// Hash and Salt password before storing to db
 	hashedPassword, err := crypto.HashAndSalt(plainPassword)
 	if err != nil {
 		log.Printf("failed to hash password: %s\n", err.Error())
-		return model.SignUpResponse{}, err
+		return model.SignUpResponse{}, ierror.ErrGeneral
 	}
 
 	user := users.User{
@@ -162,15 +163,15 @@ func (s *service) Login(ctx context.Context, req model.LoginRequest) (model.Logi
 
 	// Generate JWT
 	claims := jwt.MapClaims{
-		"user_id": user.ID,
-		"name":    user.Name,
-		"exp":     time.Now().Add(time.Hour * 24).UnixMilli(),
+		"id":          user.ID,
+		"name":        user.Name,
+		"gender":      user.Gender,
+		"is_verified": user.IsVerified,
+		"exp":         time.Now().Add(time.Hour * 24).UnixMilli(),
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	accessToken, err := token.SignedString([]byte(s.cfg.JWTSecret))
+	accessToken, err := ijwt.GenerateJWT(s.cfg.JWTSecret, claims)
 	if err != nil {
-		log.Printf("failed to sign access token: %s\n", err.Error())
-		return model.LoginResponse{}, ierror.ErrGeneral
+		return model.LoginResponse{}, err
 	}
 
 	return model.LoginResponse{

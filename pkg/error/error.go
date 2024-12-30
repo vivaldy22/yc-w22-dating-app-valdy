@@ -28,10 +28,17 @@ var (
 var (
 	ErrInvalidPassword = NewError(http.StatusOK, "101", "invalid password")
 
+	ErrUnauthorized = NewError(http.StatusUnauthorized, "401", "unauthorized")
+
+	ErrDailySwipeLimitReached = NewError(http.StatusOK, "601", "daily onboard limit has been reached")
+	ErrProfileAlreadySwiped   = NewError(http.StatusOK, "602", "you already swiped this profile")
+	ErrNoSelfSwipe            = NewError(http.StatusOK, "603", "no self onboard")
+
 	ErrDataNotFound = NewErrorNotFound(http.StatusOK, "801", "data not found")
 	ErrDatabase     = NewError(http.StatusOK, "899", "database error")
 
 	ErrInvalidRequest = NewError(http.StatusOK, "901", "invalid request")
+	ErrDuplicateData  = NewErrorDuplicate(http.StatusOK, "997", "duplicate data")
 	ErrTimeout        = NewErrorTimeout(http.StatusOK, "998", "timeout")
 	ErrGeneral        = NewError(http.StatusOK, "999", "general error")
 )

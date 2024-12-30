@@ -4,26 +4,30 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strings"
 
 	"gorm.io/gorm"
 
 	"yc-w22-dating-app-valdy/internal/domain/profiles"
+	"yc-w22-dating-app-valdy/pkg/constant"
 	"yc-w22-dating-app-valdy/pkg/database"
 	ierror "yc-w22-dating-app-valdy/pkg/error"
 )
 
-type ProfileRepository interface {
-	GetDB() *database.Database
-	WithTx(tx *gorm.DB) ProfileRepository
-	Create(ctx context.Context, profile *profiles.Profile) error
-	FindByUserID(ctx context.Context, userID string) (profiles.Profile, error)
-	FindSwipeableProfiles(ctx context.Context, swiperID, swiperGender string) ([]profiles.Profile, error)
-}
+type (
+	ProfileRepository interface {
+		GetDB() *database.Database
+		WithTx(tx *gorm.DB) ProfileRepository
+		Create(ctx context.Context, profile *profiles.Profile) error
+		FindByUserID(ctx context.Context, userID string) (profiles.Profile, error)
+		FindSwipeableProfiles(ctx context.Context, swiperID, swiperGender string) ([]profiles.Profile, error)
+	}
 
-type profileRepository struct {
-	db        *database.Database
-	tableName string
-}
+	profileRepository struct {
+		db        *database.Database
+		tableName string
+	}
+)
 
 func NewProfileRepository(db *database.Database) ProfileRepository {
 	if db == nil {
@@ -49,12 +53,17 @@ func (pr *profileRepository) WithTx(tx *gorm.DB) ProfileRepository {
 
 func (pr *profileRepository) Create(ctx context.Context, profile *profiles.Profile) error {
 	err := pr.db.Master.Create(profile).Error
-	if err != nil {
-		log.Printf("Failed Create Profile: %s\n", err.Error())
-		return err
+	if err == nil {
+		return nil
 	}
 
-	return nil
+	if strings.Contains(err.Error(), constant.DuplicateRecord) {
+		log.Printf("profile %s already exists", profile.ID)
+		return ierror.ErrDuplicateData
+	}
+
+	log.Printf("Failed Create Profile: %s\n", err.Error())
+	return ierror.ErrDatabase
 }
 
 func (pr *profileRepository) FindByUserID(ctx context.Context, userID string) (profiles.Profile, error) {
@@ -79,7 +88,7 @@ func (pr *profileRepository) FindSwipeableProfiles(ctx context.Context, swiperID
 		SELECT p.*
 		FROM profiles p
 		LEFT JOIN swipes s
-		  ON s.swiped_id = p.id AND s.swiper_id = ?
+		  ON s.swiped_id = p.user_id AND s.swiper_id = ?
 		WHERE s.id IS NULL
 		  AND p.user_id != ?
 		  AND p.gender != ?

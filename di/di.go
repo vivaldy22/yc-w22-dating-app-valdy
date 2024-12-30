@@ -4,15 +4,15 @@ import (
 	"log"
 
 	"github.com/labstack/echo/v4"
-	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 
 	"yc-w22-dating-app-valdy/config"
 	"yc-w22-dating-app-valdy/internal/repository/postgres"
 	redisrepo "yc-w22-dating-app-valdy/internal/repository/redis"
 	"yc-w22-dating-app-valdy/internal/usecase/auth"
-	"yc-w22-dating-app-valdy/internal/usecase/swipe"
+	"yc-w22-dating-app-valdy/internal/usecase/onboard"
 	"yc-w22-dating-app-valdy/pkg/database"
+	"yc-w22-dating-app-valdy/pkg/redis"
 )
 
 type DI struct {
@@ -21,8 +21,8 @@ type DI struct {
 	Echo          *echo.Echo
 	Database      *database.Database
 
-	AuthService  auth.Service
-	SwipeService swipe.Service
+	AuthService    auth.Service
+	OnboardService onboard.Service
 }
 
 func SetupDependencies() *DI {
@@ -30,26 +30,28 @@ func SetupDependencies() *DI {
 	e := echo.New()
 	logger := zap.New(nil)
 	db := database.NewDatabase(&cfg)
-	redisClient := redis.NewClient(&cfg.RedisOption)
+	redisClient := redis.NewRedis(&cfg.Redis)
 
 	// Setup Postgres Repositories
 	userRepo := postgres.NewUserRepository(db)
 	profileRepo := postgres.NewProfileRepository(db)
+	swipeRepo := postgres.NewSwipeRepository(db)
+	premiumProfileRepo := postgres.NewPremiumProfileRepository(db)
 
 	// Setup Redis Repositories
 	rateLimitRepo := redisrepo.NewRateLimitRepository(redisClient)
 
 	// Setup Use cases
 	authService := auth.NewService(&cfg, rateLimitRepo, userRepo, profileRepo)
-	swipeService := swipe.NewService(rateLimitRepo, profileRepo)
+	onboardService := onboard.NewService(&cfg, rateLimitRepo, userRepo, profileRepo, swipeRepo, premiumProfileRepo)
 
 	return &DI{
-		Configuration: &cfg,
-		Logger:        logger,
-		Echo:          e,
-		Database:      db,
-		AuthService:   authService,
-		SwipeService:  swipeService,
+		Configuration:  &cfg,
+		Logger:         logger,
+		Echo:           e,
+		Database:       db,
+		AuthService:    authService,
+		OnboardService: onboardService,
 	}
 }
 

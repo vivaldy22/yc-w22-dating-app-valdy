@@ -73,7 +73,7 @@ func (d Database) UseTx(ctx context.Context, fn func(tx *gorm.DB) error) error {
 
 	defer func() {
 		if err != nil {
-			errRb := tx.Rollback()
+			errRb := tx.Rollback().Error
 			log.Printf("TxRollback err: %v\n", errRb)
 		}
 	}()

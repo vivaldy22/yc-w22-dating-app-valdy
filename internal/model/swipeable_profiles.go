@@ -6,8 +6,8 @@ import (
 
 type (
 	GetSwipeableProfilesRequest struct {
-		UserID string `json:"user_id"`
-		Gender string `json:"gender"`
+		UserID string `json:"-"`
+		Gender string `json:"-"`
 	}
 
 	SwipeableProfile struct {
