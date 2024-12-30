@@ -15,3 +15,12 @@ databaseSlave:
   schema: "dating-db"
   username: "your-db-username"
   password: "your-db-password"
+redis:
+  addr: "localhost:6379"
+  username: ""
+  password: ""
+hashSecret: "UZ7HevQohIJtciVUrKnM8Jbywz73qV0Y"
+jwtSecret: "bb7CMldCaxCdpNekfVxwJs8yqrXWVpED"
+featureFlag:
+  enableDatabaseAutoMigrate: true
+swipeDailyLimit: 10
